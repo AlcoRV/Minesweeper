@@ -50,7 +50,7 @@ namespace Minesweeper.Controllers
             if (!_cache.TryGetValue(request.GameId, out Board? board) || board is null)
                 return NotFound(new ErrorResponse($"Игра с Id={request.GameId} не найдена"));
 
-            if(board.Completed) BadRequest(new ErrorResponse("Игра завершена"));
+            if(board.Completed) return BadRequest(new ErrorResponse("Игра завершена"));
 
             var status = _boardService.OpenCell(board, request.Col, request.Row);
             board.Completed = status != GameStatus.NotOver;
