@@ -1,6 +1,5 @@
+using Minesweeper.Middleware;
 using Minesweeper.Services;
-using System.ComponentModel;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +31,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseCors("AllowAll"); //test
 app.UseHttpsRedirection();

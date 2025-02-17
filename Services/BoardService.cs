@@ -5,8 +5,6 @@ namespace Minesweeper.Services
 {
     public class BoardService : IBoardService
     {
-        private static readonly Random _random = new Random();
-
         public Board CreateBoard(int height, int width, int countMines)
         {
             if (height < 2 || height > 30) throw new ArgumentException($"Height должно быть в пределах от 2 до 30");
@@ -41,12 +39,12 @@ namespace Minesweeper.Services
             int height = cells.Length, width = cells[0].Length;
             for (int i = 0; i < countMines; i++)
             {
-                int y = _random.Next(height), x = _random.Next(width);
+                int y = Random.Shared.Next(height), x = Random.Shared.Next(width);
 
                 while(cells[y][x].Value == -1)
                 {
-                    y = _random.Next(height);
-                    x = _random.Next(width);
+                    y = Random.Shared.Next(height);
+                    x = Random.Shared.Next(width);
                 }
 
                 cells[y][x].Value = -1;
@@ -62,7 +60,7 @@ namespace Minesweeper.Services
 
             var minesPositions = Enumerable.Range(0, height)
                 .SelectMany(y => Enumerable.Range(0, width), (y, x) => (y, x))
-                .OrderBy(it => _random.Next())
+                .OrderBy(it => Random.Shared.Next())
                 .Take(countMines)
                 .ToList();
 
@@ -105,7 +103,7 @@ namespace Minesweeper.Services
 
             if (col < 0 || col > board.Width - 1) throw new ArgumentException("Выбранный столбец находится за пределами доски");
 
-            if (board.Cells[row][col].View != '\0') throw new ArgumentException("Ячейка уже была проверена");
+            if (board.Cells[row][col].View != ' ') throw new ArgumentException("Ячейка уже была проверена");
 
             if (board.Cells[row][col].Value == -1)
             {
@@ -129,7 +127,7 @@ namespace Minesweeper.Services
 
                     if (board.Cells[pos.y][pos.x].Value != 0) continue;
 
-                    var adjacentCells = GetAdjacentCells(board.Cells, pos.y, pos.x, cell => cell.View == '\0');
+                    var adjacentCells = GetAdjacentCells(board.Cells, pos.y, pos.x, cell => cell.View == ' ');
 
                     foreach (var c in adjacentCells)
                     {
@@ -147,7 +145,7 @@ namespace Minesweeper.Services
             return status;
         }
 
-        private static bool RemainOnlyMines(Cell[][] cells) => cells.SelectMany(r => r).Where(c => c.View == '\0').All(c => c.Value == -1);
+        private static bool RemainOnlyMines(Cell[][] cells) => cells.SelectMany(r => r).Where(c => c.View == ' ').All(c => c.Value == -1);
         
 
         private static void OpenMines(Cell[][] cells)
@@ -160,7 +158,7 @@ namespace Minesweeper.Services
 
             foreach (var c in minesPositions)
             {
-                cells[c.y][c.x].Value = 'M';
+                cells[c.y][c.x].View = 'M';
             }
         }
     }

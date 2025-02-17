@@ -3,6 +3,6 @@
     public struct Cell(int value)
     {
         public int Value = value;
-        public char View = '\0';
+        public char View = ' ';
     }
 }
