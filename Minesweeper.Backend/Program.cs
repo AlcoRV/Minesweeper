@@ -1,7 +1,10 @@
+using Minesweeper.Hubs;
 using Minesweeper.Middleware;
 using Minesweeper.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSignalR();
 
 // Add services to the container.
 builder.Services.AddTransient<IBoardService, BoardService>();
@@ -17,9 +20,10 @@ builder.Services.AddCors(options => //test
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://localhost:4200")
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .AllowCredentials();
     });
 });
 
@@ -32,12 +36,19 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-
+app.UseRouting();
 app.UseCors("AllowAll"); //test
-app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    HubEndpointConventionBuilder hubEndpointConventionBuilder = endpoints.MapHub<ChatHub>("/chatHub").RequireCors("AllowAll");
+});
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.UseHttpsRedirection();
 
 app.MapControllers();
 
